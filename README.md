@@ -22,7 +22,7 @@ Library for PythonBinance API : [Python binance documentary](https://python-bina
 	"system": "Long and Short future",
 	"passphrase": "tradesabuy_binance_autotrade",
 	"time": "{{timenow}}",
-	"actual_trade": "no",
+	"actual_trade": "YES",
 	"exchange": "{{exchange}}",
 	"ticker": "{{ticker}}",
 	"bar": {
