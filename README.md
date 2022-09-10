@@ -1,10 +1,12 @@
-# tradingview-binance-test
+# Tradingview-Binance auto trade
 
 by TradeSabuy
 
-Youtube : [Trade Sabuy Youtube Channel](https://www.youtube.com/channel/UCDkxnUHxUSrFDzchFysZ-hQ)
+Youtube : [TradeSabuy Youtube Channel](https://www.youtube.com/channel/UCDkxnUHxUSrFDzchFysZ-hQ)
 
-Line ID : [@TradeSabuy](https://lin.ee/SZ8z9Nb)
+Line ID : [@TradeSabuy](https://line.me/R/ti/p/@tradesabuy)
+
+Register Tradingview : [Regist Here](https://th.tradingview.com/gopro/?share_your_love=shyStork66653)
 
 This is sample code of Webhook API from TradingView to Binance API.
 Do not use this source code for any comercial na krub.
@@ -41,14 +43,21 @@ Library for PythonBinance API : [Python binance documentary](https://python-bina
 
 ---
 
+### Actual Trade Status
+
+
+| Name         | Example      | Description                                                                   |
+| -------------- | -------------- | ------------------------------------------------------------------------------- |
+| actual_trade | "YES" or any | if not "YES", will make trade in Binance testnet, not actual Binance Exchange |
+
 ### Strategy type of order
 
 
-| Name           | Example         | Description                                                        |
-| :--------------- | ----------------- | -------------------------------------------------------------------- |
-| SIDE           | "BUY" or "SELL" | Specific**final** sideof product                                   |
-| QTY            | "5" or "5%"     | Specific**final** qty (In unit or percentage portfolio) of product |
-| <br />LEVERAGE | "1"             | Set leverage order                                                 |
+| Name     | Example         | Description                                                                   |
+| :--------- | ----------------- | ------------------------------------------------------------------------------- |
+| SIDE     | "BUY" or "SELL" | Specific preferred FINAL sideof product                                       |
+| QTY      | "5" or "5%"     | Specific preferred FINAL qty (In units or percentage of portfolio) of product |
+| LEVERAGE | "1"             | Set leverage order                                                            |
 
 ---
 
