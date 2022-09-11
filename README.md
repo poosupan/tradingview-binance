@@ -2,7 +2,7 @@
 
 by TradeSabuy
 
-Youtube : [TradeSabuy Youtube Channel](https://www.youtube.com/channel/UCDkxnUHxUSrFDzchFysZ-hQ)
+Youtube : [TradeSabuy Youtube Channel](https://www.youtube.com/c/TradeSabuy)
 
 Line ID : [@TradeSabuy](https://line.me/R/ti/p/@tradesabuy)
 
