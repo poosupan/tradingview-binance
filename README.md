@@ -15,6 +15,18 @@ Library for PythonBinance API : [Python binance documentary](https://python-bina
 
 ---
 
+### Link address to access
+
+Example To make order : https://tradingview-binance-xyzxyzxyz-as.a.run.app/**future_trade**
+
+
+| format address       | description                                |
+| ---------------------- | -------------------------------------------- |
+| .../portfolio_test   | to see Binance (TESTNET) portfolio balance |
+| .../portfolio_actual | to see Binance (Actual) portfolio balance  |
+| .../future_trade     | to run auto-trade with below format data   |
+
+
 ### Format data in TradingView Alert
 
 ```bash
@@ -54,7 +66,7 @@ Library for PythonBinance API : [Python binance documentary](https://python-bina
 
 
 | Name     | Example         | Description                                                                   |
-| :--------- | ----------------- | ------------------------------------------------------------------------------- |
+| ---------- | ----------------- | ------------------------------------------------------------------------------- |
 | SIDE     | "BUY" or "SELL" | Specific preferred FINAL sideof product                                       |
 | QTY      | "5" or "5%"     | Specific preferred FINAL qty (In units or percentage of portfolio) of product |
 | LEVERAGE | "1"             | Set leverage order                                                            |
