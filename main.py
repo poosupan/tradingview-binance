@@ -53,7 +53,24 @@ def trade_order(symbol, side, qty, client):
 
 @app.route('/')
 def helloworld():
-    return 'This is part of TradeSabuy official knowledge.'
+    return 'This is sample of Tradingview-Binance auto trade by TradeSabuy.'
+
+@app.route('/portfolio_actual')
+def portfolio_actual():
+    try:
+        client = Client(config.API_KEY_future, config.API_SECRET_future, tld='com')
+        return format(client.futures_account_balance())
+    except:
+        return 'Cannot access API ACTUAL port'
+
+@app.route('/portfolio_test')
+def portfolio_test():  
+    try:
+        client = Client(config.API_KEY_test, config.API_SECRET_test, tld='com')
+        client.FUTURES_URL  = config.testnet_URL
+        return format(client.futures_account_balance())
+    except:
+        return 'Cannot access API TEST port'
 
 @app.route('/test', methods=['POST'])
 def test():
@@ -64,10 +81,17 @@ def test():
 
 @app.route('/future_trade', methods=['POST'])
 def future_trade():
-    data = json.loads(request.data)
-    symbol = data["ticker"]
-    strategy = data['strategy']
-    side = strategy['SIDE'].upper()
+    # check Data Format
+    try:
+        data = json.loads(request.data)
+        symbol = data["ticker"]
+        strategy = data['strategy']
+        side = strategy['SIDE'].upper()
+    except Exception as e:
+        return {
+            'status': 'Wrong format data',
+            'message': format(e)
+            }
 
     # check Pass phrase
     if data['passphrase'] != config.WEBHOOK_PASSPHRASE:
@@ -75,6 +99,7 @@ def future_trade():
             "code": "error",
             "message": "Invalid passphrase"
         }
+
     # check TEST or ACTUAL trade
     if data['actual_trade'].upper() == "YES":
         client = Client(config.API_KEY_future, config.API_SECRET_future, tld='com')

@@ -35,7 +35,7 @@ Library for PythonBinance API : [Python binance documentary](https://python-bina
 	},
 	"strategy": {
 		"SIDE": "BUY",
-		"QTY": "50%",
+		"QTY": "5%",
 		"LEVERAGE": "1"
 	}
 }
@@ -43,7 +43,7 @@ Library for PythonBinance API : [Python binance documentary](https://python-bina
 
 ---
 
-### Actual Trade Status
+### Actual Trade type
 
 
 | Name         | Example      | Description                                                                   |
