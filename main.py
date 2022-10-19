@@ -120,6 +120,10 @@ def future_trade():
         URL = config.URL + symbol.upper()
         last_price = float(requests.get(URL).json()['lastPrice'])
         require_qty_raw = get_cash(client)[0] * percentage_port_require / last_price
+    elif strategy['QTY'][-4] == "USDT":
+        URL = config.URL + symbol.upper()
+        last_price = float(requests.get(URL).json()['lastPrice'])
+        require_qty_raw = float(strategy['QTY'][:-4]) / last_price
     else:
         require_qty_raw = float(strategy['QTY'])
 
