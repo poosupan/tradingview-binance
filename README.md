@@ -34,6 +34,7 @@ Example To make order : https://tradingview-binance-xyzxyzxyz-as.a.run.app/futur
 	"passphrase": "tradesabuy_binance_autotrade",
 	"time": "{{timenow}}",
 	"actual_trade": "no",
+	"QTY_Type": "FINAL",
 	"exchange": "{{exchange}}",
 	"ticker": "{{ticker}}",
 	"bar": {
@@ -57,9 +58,10 @@ Example To make order : https://tradingview-binance-xyzxyzxyz-as.a.run.app/futur
 ### Actual Trade type
 
 
-| Name         | Example      | Description                                                                   |
-| -------------- | -------------- | ------------------------------------------------------------------------------- |
-| actual_trade | "YES" or any | if not "YES", will make trade in Binance testnet, not actual Binance Exchange |
+| Name         | Example             | Description                                                                                                     |
+| -------------- | --------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| actual_trade | "YES" or any        | If not "YES", will make trade in Binance testnet, not actual Binance Exchange                                   |
+| QTY_Type     | "FINAL" or "ACTUAL" | If "FINAL", input QTY will be final quantity type.<br />If "ACTUAL", input QTY will be number of order sending. |
 
 ### Strategy type of order
 

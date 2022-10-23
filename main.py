@@ -120,13 +120,13 @@ def future_trade():
         URL = config.URL + symbol.upper()
         last_price = float(requests.get(URL).json()['lastPrice'])
         require_qty_raw = get_cash(client)[0] * percentage_port_require / last_price
-    elif strategy['QTY'].isnumeric():
-        require_qty_raw = float(strategy['QTY'])
-    else:
+    elif 'USDT' in strategy['QTY']:
         URL = config.URL + symbol.upper()
         last_price = float(requests.get(URL).json()['lastPrice'])
         require_qty_raw = float(strategy['QTY'][:-4]) / last_price
-
+    else:
+        require_qty_raw = float(strategy['QTY'])
+        
     # Round Decimal of symbol
     for i in client.futures_exchange_info()["symbols"]:
         if i['symbol'] == symbol:
@@ -137,14 +137,23 @@ def future_trade():
         require_qty = -require_qty
 
     # make order
-    action_amount = require_qty - get_existing_amount(symbol, client)
-    if action_amount > 0:
-        order = trade_order(symbol, "BUY", abs(action_amount), client)
-    elif action_amount < 0:
-        order = trade_order(symbol, "SELL", abs(action_amount), client)
-    else:
-        order = trade_order(symbol, side, abs(action_amount), client)
+    try:
+        QuantityType = data["QTY_Type"].upper()
+    except:
+        QuantityType = "ACTUAL"
     
+    if QuantityType == "FINAL":
+        action_amount = require_qty - get_existing_amount(symbol, client)
+        action_amount = round_decimals_down(action_amount, precision)
+        if action_amount > 0:
+            order = trade_order(symbol, "BUY", abs(action_amount), client)
+        elif action_amount < 0:
+            order = trade_order(symbol, "SELL", abs(action_amount), client)
+        else:
+            order = trade_order(symbol, side, abs(action_amount), client)
+    else:
+        order = trade_order(symbol, side, abs(require_qty), client)
+        
     return(order)
 
 if __name__ == "__main__":
