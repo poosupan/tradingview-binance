@@ -89,24 +89,29 @@ def future_trade():
         side = strategy['SIDE'].upper()
     except Exception as e:
         return {
-            'status': 'Wrong format data',
-            'message': format(e)
+            'status': 'error',
+            'message': 'format json'
             }
 
     # check Pass phrase
     if data['passphrase'] != config.WEBHOOK_PASSPHRASE:
         return {
-            "code": "error",
+            "status": "error",
             "message": "Invalid passphrase"
         }
 
     # check TEST or ACTUAL trade
-    if data['actual_trade'].upper() == "YES":
-        client = Client(config.API_KEY_future, config.API_SECRET_future, tld='com')
-    else:
-        client = Client(config.API_KEY_test, config.API_SECRET_test, tld='com')
-        client.FUTURES_URL  = config.testnet_URL
-
+    try:
+        if data['actual_trade'].upper() == "YES":
+            client = Client(config.API_KEY_future, config.API_SECRET_future, tld='com')
+        else:
+            client = Client(config.API_KEY_test, config.API_SECRET_test, tld='com')
+            client.FUTURES_URL  = config.testnet_URL
+    except:
+        return {
+            "status": "error",
+            "message": "Cannot check test or actual trade"
+        }
     # Set leverage
     try:
         leverage_setup = round(float(strategy['LEVERAGE']))
@@ -115,26 +120,38 @@ def future_trade():
     client.futures_change_leverage(symbol = symbol, leverage = leverage_setup)
 
     # check qty type (Percentage or unit)
-    if strategy['QTY'][-1] == "%":
-        percentage_port_require = float(strategy['QTY'][:-1])/100
-        URL = config.URL + symbol.upper()
-        last_price = float(requests.get(URL).json()['lastPrice'])
-        require_qty_raw = get_cash(client)[0] * percentage_port_require / last_price
-    elif 'USDT' in strategy['QTY']:
-        URL = config.URL + symbol.upper()
-        last_price = float(requests.get(URL).json()['lastPrice'])
-        require_qty_raw = float(strategy['QTY'][:-4]) / last_price
-    else:
-        require_qty_raw = float(strategy['QTY'])
-        
+    try:
+        if strategy['QTY'][-1] == "%":
+            percentage_port_require = float(strategy['QTY'][:-1])/100
+            URL = config.URL + symbol.upper()
+            last_price = float(requests.get(URL).json()['lastPrice'])
+            require_qty_raw = get_cash(client)[0] * percentage_port_require / last_price
+        elif 'USDT' in strategy['QTY']:
+            URL = config.URL + symbol.upper()
+            last_price = float(requests.get(URL).json()['lastPrice'])
+            require_qty_raw = float(strategy['QTY'][:-4]) / last_price
+        else:
+            require_qty_raw = float(strategy['QTY'])
+    except:
+        return {
+            "status": "error",
+            "message": "Cannot check QTY type"
+        }  
+    
     # Round Decimal of symbol
-    for i in client.futures_exchange_info()["symbols"]:
-        if i['symbol'] == symbol:
-            precision =  int(i['quantityPrecision'])
-            break
-    require_qty = round_decimals_down(require_qty_raw, precision)
-    if side == "SELL":
-        require_qty = -require_qty
+    try:
+        for i in client.futures_exchange_info()["symbols"]:
+            if i['symbol'] == symbol:
+                precision =  int(i['quantityPrecision'])
+                break
+        require_qty = round_decimals_down(require_qty_raw, precision)
+        if side == "SELL":
+            require_qty = -require_qty
+    except:
+        return {
+            "status": "error",
+            "message": "Cannot round decimal"
+        }
 
     # make order
     try:
@@ -142,18 +159,24 @@ def future_trade():
     except:
         QuantityType = "ACTUAL"
     
-    if QuantityType == "FINAL":
-        action_amount = require_qty - get_existing_amount(symbol, client)
-        action_amount = round_decimals_down(action_amount, precision)
-        if action_amount > 0:
-            order = trade_order(symbol, "BUY", abs(action_amount), client)
-        elif action_amount < 0:
-            order = trade_order(symbol, "SELL", abs(action_amount), client)
+    try:
+        if QuantityType == "FINAL":
+            action_amount = require_qty - get_existing_amount(symbol, client)
+            action_amount = round_decimals_down(action_amount, precision)
+            if action_amount > 0:
+                order = trade_order(symbol, "BUY", abs(action_amount), client)
+            elif action_amount < 0:
+                order = trade_order(symbol, "SELL", abs(action_amount), client)
+            else:
+                order = trade_order(symbol, side, abs(action_amount), client)
         else:
-            order = trade_order(symbol, side, abs(action_amount), client)
-    else:
-        order = trade_order(symbol, side, abs(require_qty), client)
-        
+            order = trade_order(symbol, side, abs(require_qty), client)
+    except:
+        return {
+            "status": "error",
+            "message": "Cannot make order"
+        }
+
     return(order)
 
 if __name__ == "__main__":
