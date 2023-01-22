@@ -55,6 +55,35 @@ Example To make order : https://tradingview-binance-xyzxyzxyz-as.a.run.app/futur
 
 ---
 
+### Format data for testing
+
+```bash
+{
+	"system": "Long and Short future",
+	"passphrase": "tradesabuy_binance_autotrade",
+	"time": "22 Jan 2023",
+	"actual_trade": "no",
+	"QTY_Type": "FINAL",
+	"exchange": "Binance",
+	"ticker": "BTCUSDT",
+	"bar": {
+		"time": "9:00",
+		"open": 10000,
+		"high": 12000,
+		"low": 8000,
+		"close": 11000,
+		"volume": 100
+	},
+	"strategy": {
+		"SIDE": "BUY",
+		"QTY": "5%",
+		"LEVERAGE": "1"
+	}
+}
+```
+
+---
+
 ### Actual Trade type
 
 

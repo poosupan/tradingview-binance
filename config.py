@@ -1,6 +1,7 @@
 WEBHOOK_PASSPHRASE = 'tradesabuy_binance_autotrade'
 URL = "https://fapi.binance.com/fapi/v1/ticker/24hr?symbol="
 testnet_URL = 'https://testnet.binancefuture.com/fapi'
+line_token = 'Line_Token_Here'
 
 ## test
 API_KEY_test = 'API_KEY_HERE'

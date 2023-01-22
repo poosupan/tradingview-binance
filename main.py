@@ -8,6 +8,15 @@ from binance.enums import *
 
 app = Flask(__name__)
 
+def line(msg):
+    try:
+        url = 'https://notify-api.line.me/api/notify'
+        token = config.line_token
+        headers = {'content-type': 'application/x-www-form-urlencoded', 'Authorization': 'Bearer ' + token}
+        r = requests.post(url, headers=headers, data={'message': msg})
+    except:
+        print('Cannot access line noti')
+
 def round_decimals_down(number:float, decimals:int=2):
     """
     Returns a value rounded down to a specific number of decimal places.
@@ -107,34 +116,40 @@ def future_trade():
         client = Client(config.API_KEY_test, config.API_SECRET_test, tld='com')
         client.FUTURES_URL  = config.testnet_URL
 
+    # check qty type (Percentage or unit)
+    try:
+        if strategy['QTY'][-1] == "%":
+            percentage_port_require = float(strategy['QTY'][:-1])/100
+            URL = config.URL + symbol.upper()
+            last_price = float(requests.get(URL).json()['lastPrice'])
+            require_qty_raw = get_cash(client)[0] * percentage_port_require / last_price
+        elif 'USDT' in strategy['QTY']:
+            URL = config.URL + symbol.upper()
+            last_price = float(requests.get(URL).json()['lastPrice'])
+            require_qty_raw = float(strategy['QTY'][:-4]) / last_price
+        else:
+            require_qty_raw = float(strategy['QTY'])
+    except:
+        return {
+            "code": "error",
+            "message": "Cannot check qty"
+        }
+
     # Set leverage
     try:
         leverage_setup = round(float(strategy['LEVERAGE']))
     except:
         leverage_setup = 1
     client.futures_change_leverage(symbol = symbol, leverage = leverage_setup)
+    require_qty_raw = require_qty_raw * leverage_setup
 
-    # check qty type (Percentage or unit)
-    if strategy['QTY'][-1] == "%":
-        percentage_port_require = float(strategy['QTY'][:-1])/100
-        URL = config.URL + symbol.upper()
-        last_price = float(requests.get(URL).json()['lastPrice'])
-        require_qty_raw = get_cash(client)[0] * percentage_port_require / last_price
-    elif 'USDT' in strategy['QTY']:
-        URL = config.URL + symbol.upper()
-        last_price = float(requests.get(URL).json()['lastPrice'])
-        require_qty_raw = float(strategy['QTY'][:-4]) / last_price
-    else:
-        require_qty_raw = float(strategy['QTY'])
-        
     # Round Decimal of symbol
     for i in client.futures_exchange_info()["symbols"]:
         if i['symbol'] == symbol:
             precision =  int(i['quantityPrecision'])
             break
-    require_qty = round_decimals_down(require_qty_raw, precision)
     if side == "SELL":
-        require_qty = -require_qty
+        require_qty_raw = -require_qty_raw
 
     # make order
     try:
@@ -142,18 +157,26 @@ def future_trade():
     except:
         QuantityType = "ACTUAL"
     
-    if QuantityType == "FINAL":
-        action_amount = require_qty - get_existing_amount(symbol, client)
-        action_amount = round_decimals_down(action_amount, precision)
-        if action_amount > 0:
-            order = trade_order(symbol, "BUY", abs(action_amount), client)
-        elif action_amount < 0:
-            order = trade_order(symbol, "SELL", abs(action_amount), client)
+    try:
+        if QuantityType == "FINAL":
+            action_amount = require_qty_raw - get_existing_amount(symbol, client)
+            action_amount = round_decimals_down(action_amount, precision)
+            if action_amount > 0:
+                order = trade_order(symbol, "BUY", abs(action_amount), client)
+            elif action_amount < 0:
+                order = trade_order(symbol, "SELL", abs(action_amount), client)
+            else:
+                order = trade_order(symbol, side, abs(action_amount), client)
         else:
-            order = trade_order(symbol, side, abs(action_amount), client)
-    else:
-        order = trade_order(symbol, side, abs(require_qty), client)
-        
+            require_qty = round_decimals_down(require_qty_raw, precision)
+            order = trade_order(symbol, side, abs(require_qty), client)
+    except:
+        return {
+            "code": "error",
+            "message": "Cannot make order"
+        }
+
+    line(order['message'])
     return(order)
 
 if __name__ == "__main__":
